@@ -1,5 +1,5 @@
 #!/bin/bash
-## This is a bash script to retrieve reverse project forward reads from 90 Giardia genomes (PRJNA280606); could use wget as well instead of curl
+## This is a bash script to retrieve specified project reads from 90 Giardia genomes (PRJNA280606); could use wget as well instead of curl
 ## Ask Shweta if you are confused
 ##These commands set up the Grid Environment for your job:
 #PBS -N nameforyourjob
