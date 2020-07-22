@@ -1,0 +1,99 @@
+First, I have installed Dedropy and SEP as modules (in Software subfolder)
+
+Then I loaded this sequence of modules:
+
+[~]$ module load arch/avx2 StdEnv/2016.4
+[~]$ module load gcc/5.4.0 blast+/2.6.0 hmmer/3.1b2 augustus/3.2.3 emboss/6.6.0 r/3.5.0
+[~]$ module load dendropy/4.4.0 prodigal/2.6.3
+[~]$ module load sepp/4.3.10
+
+Note that python/3.7.4 is loaded as a dependency when loading the above modules (see below).
+
+Checking the list of the modules:
+
+[~]$ module list
+
+Currently Loaded Modules:
+  1) arch/avx2            6) blast+/2.6.0    (bio)   11) metis/5.1.0       (math)  16) java/1.8.0_121 (t)    21) dendropy/4.4.0
+  2) nixpkgs/16.09  (S)   7) hmmer/3.1b2     (bio)   12) suitesparse/4.5.4 (math)  17) emboss/6.6.0   (bio)  22) prodigal/2.6.3 (bio)
+  3) StdEnv/2016.4  (S)   8) boost/1.60.0    (t)     13) lpsolve/5.5.2.5   (math)  18) r/3.5.0        (t)    23) sepp/4.3.10
+  4) gcccore/.5.4.0 (H)   9) gsl/2.3         (math)  14) bamtools/2.4.1    (bio)   19) openmpi/2.1.1  (m)
+  5) gcc/5.4.0      (t)  10) imkl/11.3.4.258 (math)  15) augustus/3.2.3    (bio)   20) python/3.7.4   (t)
+
+Installing BUSCO in a new virtual environment:
+
+[pip17@beluga3]$ cd Software
+[pip17@beluga3 Software]$ git clone https://gitlab.com/ezlab/busco.git
+[pip17@beluga3 Software]$ virtualenv /home/$USER/mybusco_env
+[pip17@beluga3 Software]$ source /home/$USER/mybusco_env/bin/activate
+(mybusco_env) [pip17@beluga3 Software]$ pip install Biopython
+(mybusco_env) [pip17@beluga3 Software]$ cd busco/
+(mybusco_env) [pip17@beluga3 busco]$ python setup.py install
+(mybusco_env) [pip17@beluga3 busco]$ cp -r scripts test_data /home/$USER/mybusco_env/
+
+The installation now done.
+
+Of course, you will need the config files {config.ini.default and augustus_config} before running the code. You can get them as follow:
+
+wget -O $HOME/busco_config.ini https://gitlab.com/ezlab/busco/raw/master/config/config.ini.default
+cp -r $EBROOTAUGUSTUS/config $HOME/augustus_config
+
+As for running the program in a job, you will need to add the following to your script:
+
+module load arch/avx2 StdEnv/2016.4
+module load gcc/5.4.0 blast+/2.6.0 hmmer/3.1b2 augustus/3.2.3 emboss/6.6.0 r/3.5.0
+module load dendropy/4.4.0 prodigal/2.6.3
+module load sepp/4.3.10
+
+export BUSCO_CONFIG_FILE=$HOME/busco_config.ini
+export AUGUSTUS_CONFIG_PATH=$HOME/augustus_config
+export PATH=$PATH:/home/$USER/mybusco_env/scripts
+
+source /home/$USER/mybusco_env/bin/activate
+
+{put here the commands to run the code}.
+
+Note that I never used BUSCO. Therefore, I do not know what are the options to run it. I do not see the script "run_BUSCO.py"
+
+The command "busco --help" shows the different options.
+
+(mybusco_env) [pip17@beluga3 ~]$ busco --help
+usage: busco -i [SEQUENCE_FILE] -l [LINEAGE] -o [OUTPUT_NAME] -m [MODE] [OTHER OPTIONS]
+
+Welcome to BUSCO 4.1.1: the Benchmarking Universal Single-Copy Ortholog assessment tool.
+For more detailed usage information, please review the README file provided with this distribution and the BUSCO user guide.
+
+optional arguments:
+  -i FASTA FILE, --in FASTA FILE
+                        Input sequence file in FASTA format. Can be an assembled genome or transcriptome (DNA), or protein sequences from an annotated gene set.
+  -c N, --cpu N         Specify the number (N=integer) of threads/cores to use.
+  -o OUTPUT, --out OUTPUT
+                        Give your analysis run a recognisable short name. Output folders and files will be labelled with this name. WARNING: do not provide a path
+  --out_path OUTPUT_PATH
+                        Optional location for results folder, excluding results folder name. Default is current working directory.
+  -e N, --evalue N      E-value cutoff for BLAST searches. Allowed formats, 0.001 or 1e-03 (Default: 1e-03)
+  -m MODE, --mode MODE  Specify which BUSCO analysis mode to run.
+                        There are three valid modes:
+                        - geno or genome, for genome assemblies (DNA)
+                        - tran or transcriptome, for transcriptome assemblies (DNA)
+                        - prot or proteins, for annotated gene sets (protein)
+  -l LINEAGE, --lineage_dataset LINEAGE
+                        Specify the name of the BUSCO lineage to be used.
+  -f, --force           Force rewriting of existing files. Must be used when output files with the provided name already exist.
+  -r, --restart         Continue a run that had already partially completed.
+  --limit REGION_LIMIT  How many candidate regions (contig or transcript) to consider per BUSCO (default: 3)
+  --long                Optimization mode Augustus self-training (Default: Off) adds considerably to the run time, but can improve results for some non-model organisms
+  -q, --quiet           Disable the info logs, displays only errors
+  --augustus_parameters AUGUSTUS_PARAMETERS
+                        Pass additional arguments to Augustus. All arguments should be contained within a single pair of quotation marks, separated by commas. E.g. '--param1=1,--param2=2'
+  --augustus_species AUGUSTUS_SPECIES
+                        Specify a species for Augustus training.
+  --auto-lineage        Run auto-lineage to find optimum lineage path
+  --auto-lineage-prok   Run auto-lineage just on non-eukaryote trees to find optimum lineage path
+  --auto-lineage-euk    Run auto-placement just on eukaryote tree to find optimum lineage path
+  --update-data         Download and replace with last versions all lineages datasets and files necessary to their automated selection
+  --offline             To indicate that BUSCO cannot attempt to download files
+  --config CONFIG_FILE  Provide a config file
+  -v, --version         Show this version and exit
+  -h, --help            Show this help message and exit
+  --list-datasets       Print the list of available BUSCO datasets
