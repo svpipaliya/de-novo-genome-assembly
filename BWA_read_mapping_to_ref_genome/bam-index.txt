@@ -1,0 +1,1 @@
+samtools index map_pe.sorted.bam
