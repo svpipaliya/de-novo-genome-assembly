@@ -1,0 +1,1 @@
+liftoff ref.filtered.fasta GiardiaDB-48_GintestinalisAssemblageAWB_Genome.fasta -g GiardiaDB-48_GintestinalisAssemblageAWB.gff -o SRR3177750_annotation_mapped.fasta -u SRR3177750_unmapped_features.txt
